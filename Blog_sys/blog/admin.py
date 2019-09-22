@@ -3,6 +3,8 @@ from django.urls import reverse
 from django.utils.html import format_html
 from .models import Post, Category, Tag
 
+from .adminforms import PostAdminForm
+
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -29,26 +31,64 @@ class TagAdmin(admin.ModelAdmin):
 		return super(TagAdmin, self).save_model(request, obj, form, change)
 
 
+class CategoryOwnerFilter(admin.SimpleListFilter):
+	""" 自定义过滤器只展示当前用户分类"""
+	title = '用户分类过滤器'
+	parameter_name = 'owner_category'
+
+	def lookups(self, request, model_admin):
+		return Category.objects.filter(owner=request.user).values_list('id', 'name')
+
+	def queryset(self, request, queryset):
+		category_id = self.value()
+		if category_id:
+			return queryset.filter(category_id=self.value())
+		return queryset
+
+
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-	list_display = ['title', 'category', 'status', 'create_time', 'operator']
+	form = PostAdminForm
+	list_display = ['title', 'category', 'status', 'create_time', 'owner', 'operator']
 	list_display_links = []
 
-	list_filter = ['category']
+	list_filter = [CategoryOwnerFilter]
 	search_fields = ['title', 'category_name']
 
-	actions_on_top = True
+	actions_on_top = False
 	actions_on_bottom = True
 
-	save_on_top = True
+	save_on_top = False
 
-	fields = (
-		('category', 'title'),
-		'desc',
-		'status',
-		'content',
-		'tag',
+	exclude = ['owner']
+
+	# fields = (
+	# 	('category', 'title'),
+	# 	'desc',
+	# 	'status',
+	# 	'content',
+	# 	'tag',
+	# )
+
+	# 自定义文章页面布局
+	fieldsets = (
+		('基础配置', {
+			'description': '基础配置描述',
+			'fields': (
+				('title', 'category'),
+				'status',
+			)
+		}),
+		('内容', {
+			'fields': ('desc', 'content')
+		}),
+		('额外信息', {
+			'classes': ('collapse',),
+			'fields': ('tag',),
+		}),
 	)
+
+	filter_horizontal = ('tag',)
 
 	def operator(self, obj):
 		return format_html(
@@ -62,8 +102,15 @@ class PostAdmin(admin.ModelAdmin):
 		obj.owner = request.user
 		return super(PostAdmin, self).save_model(request, obj, form, change)
 
+	def get_queryset(self, request):
+		qs = super(PostAdmin, self).get_queryset(request)
+		return qs.filter(owner=request.user)
 
-
+	# class Media:
+	# 	css = {
+	# 		'all': ('https://cdn.bootcss.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css',),
+	# 	}
+	# 	js = ('https://cdn.bootcss.com/bootstrap/4.0.0-beta.2/js/bootstrap.bundle.js',)
 
 
 
