@@ -3,12 +3,13 @@ from django.urls import reverse
 from django.utils.html import format_html
 from .models import Post, Category, Tag
 
+from Blog_sys.base_admin import BaseOwnerAdmin
 from .adminforms import PostAdminForm
 from Blog_sys.custom_site import custom_site
 
 
 @admin.register(Category, site=custom_site)
-class CategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(BaseOwnerAdmin):
 	list_display = ('name', 'status', 'is_nav', 'create_time', 'post_count')
 	fields = ('name', 'status', 'is_nav')
 
@@ -23,7 +24,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 @admin.register(Tag, site=custom_site)
-class TagAdmin(admin.ModelAdmin):
+class TagAdmin(BaseOwnerAdmin):
 	list_display = ('name', 'status', 'create_time')
 	fields = ('name', 'status')
 
@@ -48,7 +49,7 @@ class CategoryOwnerFilter(admin.SimpleListFilter):
 
 
 @admin.register(Post, site=custom_site)
-class PostAdmin(admin.ModelAdmin):
+class PostAdmin(BaseOwnerAdmin):
 	form = PostAdminForm
 	list_display = ['title', 'category', 'status', 'create_time', 'owner', 'operator']
 	list_display_links = []
@@ -60,8 +61,6 @@ class PostAdmin(admin.ModelAdmin):
 	actions_on_bottom = True
 
 	save_on_top = False
-
-	exclude = ['owner']
 
 	# fields = (
 	# 	('category', 'title'),
@@ -99,13 +98,6 @@ class PostAdmin(admin.ModelAdmin):
 
 	operator.short_description = '操作'
 
-	def save_model(self, request, obj, form, change):
-		obj.owner = request.user
-		return super(PostAdmin, self).save_model(request, obj, form, change)
-
-	def get_queryset(self, request):
-		qs = super(PostAdmin, self).get_queryset(request)
-		return qs.filter(owner=request.user)
 
 	# class Media:
 	# 	css = {
