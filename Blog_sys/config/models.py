@@ -60,4 +60,6 @@ class SideBar(models.Model):
 	def __str__(self):
 		return self.title
 
-
+	@classmethod
+	def get_all(cls):
+		return cls.objects.filter(status=cls.STATUS_SHOW)

@@ -1,21 +1,28 @@
 from django.shortcuts import render
 
-from .models import Post, Tag
+from .models import Category, Post, Tag
+from config.models import SideBar
 
 
 def post_list(request, category_id=None, tag_id=None):
+	tag = None
+	category = None
 	if tag_id:
-		try:
-			tag = Tag.objects.get(id=tag_id)
-		except Tag.DoesNotExists:
-			post = []
-		else:
-			post = tag.post_set.filter(status=Post.STATUS_NORMAL)
+		post, tag = Post.get_by_tag(tag_id)
+	elif category_id:
+		post, category = Post.get_by_category(category_id)
 	else:
-		post = Post.objects.filter(status=Post.STATUS_NORMAL)
-		if category_id:
-			post = post.filter(category_id=category_id)
-	return render(request, 'blog/list.html', context={'post_list': post})
+		post = Post.latest_posts()
+
+	context = {
+		'category': category,
+		'tag': tag,
+		'post_list': post,
+		'sidebars': SideBar.get_all(),
+	}
+	context.update(Category.get_navs())
+
+	return render(request, 'blog/list.html', context=context)
 
 
 def post_detail(request, post_id=None):
@@ -23,4 +30,9 @@ def post_detail(request, post_id=None):
 		post = Post.objects.get(id=post_id)
 	except Post.DoesNotExist:
 		post = None
-	return render(request, 'blog/detail.html', context={'post': post})
+	context = {
+		'post': post
+	}
+	context.update(Category.get_navs())
+
+	return render(request, 'blog/detail.html', context=context)

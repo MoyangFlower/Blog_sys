@@ -4,8 +4,22 @@
     <meta charset="UTF-8">
     <title>文章列表</title>
 </head>
-<body>
-    <ul>
+<</bo>
+    <div>顶部分类
+        {% for nav in navs %}
+        <a href="/category/{{ nav.id }}/">{{ nav.name }}</a>
+        {% endfor %}
+    </div>
+    <hr/>
+    <div>
+        {% if tag %}
+        标签页: {{ tag.name }}
+        {% endif %}
+
+        {% if category %}
+        分类页: {{ category.name }}
+        {% endif %}
+        <ul>
         {% for post in post_list %}
         <li>
             <a href="/post/{{ post.id }}">{{ post.title }}</a>
@@ -17,5 +31,19 @@
         </li>
         {% endfor %}
     </ul>
+    </div>
+    <hr/>
+    <div>底部分类
+        {% for cate in categories %}
+        <a href="/category/{{ cate.id }}/">{{ cate.name }}</a>
+        {% endfor %}
+    </div>
+    <hr/>
+    <div>侧边栏显示
+        {% for sidebar in sidebars %}
+        <h4>{{ sidebar.title }}</h4>
+        {{ sidebar.content }}
+        {% endfor %}
+    </div>
 </body>
 </html>
