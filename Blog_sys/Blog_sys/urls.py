@@ -19,7 +19,7 @@ from django.conf.urls import url
 from .custom_site import custom_site
 from config.views import links
 from blog.views import (
-    PostDetailView, IndexView, CategoryView, TagView)
+    PostDetailView, IndexView, CategoryView, TagView, SearchView, AuthorView)
 
 urlpatterns = [
     url(r'^$', IndexView.as_view(), name='index'),
@@ -29,4 +29,6 @@ urlpatterns = [
     url(r'^links/$', links, name='links'),
     url(r'^super_admin/', admin.site.urls, name='super-admin'),
     url(r'^admin/', custom_site.urls, name='admin'),
+    url(r'^search/$', SearchView.as_view(), name='search'),
+    url(r'^author/(?P<owner_id>\d+)/$', AuthorView.as_view(), name='author'),
 ]
