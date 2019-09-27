@@ -1,3 +1,9 @@
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/googlecode.min.css' %}">
+<script src="{% static 'js/highlight.min.js' %}"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+{% endblock %}
 {% if post %}
 <h1>{{ post.title }}</h1>
 <div>
@@ -6,5 +12,7 @@
 
 </div>
 <hr/>
-<p>{{ post.content }}</p>
+{% autoescape off %}
+{{ post.content_html }}
+{% endautoescape %}
 {% endif %}
