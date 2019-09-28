@@ -22,6 +22,10 @@ from config.views import LinkListView
 from blog.views import (
     PostDetailView, IndexView, CategoryView, TagView, SearchView, AuthorView)
 from autocomplete import CategoryAutocomplete, TagAutocomplete
+from django.conf import settings
+from django.conf.urls import url, include
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     url(r'^$', IndexView.as_view(), name='index'),
@@ -34,4 +38,5 @@ urlpatterns = [
     url(r'^links/$', LinkListView.as_view(), name='links'),
     url(r'^category-autocomplete/$', CategoryAutocomplete.as_view(), name='category-autocomplete'),
     url(r'^tag-autocomplete/$', TagAutocomplete.as_view(), name='tag-autocomplete'),
-]
+    url(r'^ckeditor/', include('ckeditor_uploader.urls')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_URL)
