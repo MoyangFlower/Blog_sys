@@ -11,11 +11,12 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-
+sys.path.insert(0, os.path.join(BASE_DIR, 'Blog_sys'))
+sys.path.insert(0, os.path.join(BASE_DIR, 'extra_apps'))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -29,15 +30,26 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'ckeditor',
+    'ckeditor_uploader',
+    'dal',
+    'dal_select2',
+    'Blog_sys',
+    'blog',
+    'config',
+    'comment',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'xadmin',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
+    'blog.middleware.user_id.UserIDMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -49,10 +61,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'Blog_sys.urls'
 
+THEME = 'bootstrap'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'themes', THEME, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -103,4 +117,26 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
+STATIC_ROOT = '/tmp/static'
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'themes', THEME, 'static')
+]
+
+XADMIN_TITLE = 'xixi管理后台'
+XADMIN_FOOTER_TITLE = 'power by JacobYang'
+
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 300,
+        'width': 800,
+        'tableSpace': 4,
+        'extraPlugins': 'codesnippet', # 配置插件代码
+    }
+}
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+CKEDITOR_UPLOAD_PATH = "article_images"
